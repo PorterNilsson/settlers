@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "settlers"
+version = "0.0.1"
+authors = [
+  { name="Porter Nilsson", email="porter.nilsson@gmail.com" },
+]
+description = "An ASCII display and backend logic package for Settlers of Catan"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/PorterNilsson/settlers"
