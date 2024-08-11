@@ -1,3 +1,5 @@
+'''A module for displaying the Settlers game-state in ASCII'''
+
 def displayboard():
     print('Print the board')
 
