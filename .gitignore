@@ -1,5 +1,5 @@
 .gitignore
 /venv
 notes.txt
-/src/settlers.egg-info
+/settlers.egg-info
 /dist

@@ -1,7 +1,7 @@
 '''A module for displaying the Settlers game-state in ASCII'''
 
-def displayboard():
-    print('Print the board')
+def display_board():
+    return 'ASCII Board'
 
 # Build road
 # Build settlement
