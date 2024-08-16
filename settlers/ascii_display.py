@@ -84,10 +84,6 @@ class Display:
 # Display Dice(Number)
 
 def main():
-
-    print('Hello')
-    print('\r\r')
-    print('hi')
     
     display: Display = Display()
 
