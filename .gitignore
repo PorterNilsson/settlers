@@ -4,3 +4,5 @@ notes.txt
 /dist
 __pycache__
 notebook.txt
+test_output.txt
+test.py
