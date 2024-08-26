@@ -5,13 +5,27 @@ class BoardDisplay:
     COLORS = {
         "RED": "255;0;0",
         "ORANGE": "255;128;0",
+        "CLAY": "204;102;0",
         "YELLOW": "255;255;0",
+        "GOLD": "204;204;0",
+        "TAN": "255;204;153",
         "GREEN": "0;255;0",
+        "DARK_GREEN": "0;102;0",
         "BLUE": "0;0;255",
-        "PURPLE": "127;0;255", 
-        "WHITE": ""
+        "OCEAN": "51;153;255",
+        "PURPLE": "127;0;255",
+        "SILVER": "128;128;128", 
+        "WHITE": "255;255;255"
         }
     INTERSECTION_TYPES = ("*", "s", "C")
+    HEX_TYPES = {
+        "FOREST": "DARK_GREEN",
+        "PASTURE": "GREEN",
+        "FIELD": "GOLD",
+        "HILL": "CLAY",
+        "MOUNTAIN": "SILVER",
+        "DESERT": "TAN"
+    }
 
     def __init__(self, size, schema=tuple(range(19))):
         # Size maps to the diagonal length of any individual hex.
@@ -25,16 +39,17 @@ class BoardDisplay:
         self.top_height = 0
         # Number of newlines composing the middle portion of the board.
         self.middle_height = 0
+        self.board_width = 0
         self._initialize_border()
 
         # Board characteristics to determine row, col locations of all hexes and their intersections (offsets) relative to board size.
         self.hex_schema = BoardDisplay._validate_schema(schema)
         self.hex_origin = self._get_hex_origin()
         self.hex_locations = self._get_hex_locations()
-        print(self.hex_locations)
         self.hex_offsets = self._get_hex_offsets()
         self._initialize_intersections()
         self._initialize_roads()
+        self._initialize_ocean()
     
 
     def set_intersection(self, hex, offset, color, intersection_type):
@@ -101,11 +116,30 @@ class BoardDisplay:
             start[1] += col_increment
 
 
+    def set_hex_type(self, hex, hex_type):
+        color = BoardDisplay.HEX_TYPES.get(hex_type)
+
+        row, col = self._get_location(hex, 0)
+        row += 1; col += 1
+        buffer = 0
+        for i in range(1 + (2 * self.diagonal_len)):
+            for j in range(self.horizontal_len + buffer):
+                self.board[row][col + j] = f"\x1b[38;2;{BoardDisplay.COLORS.get(color)}m*\x1b[0m"
+            row += 1
+            if i >= self.diagonal_len:
+                buffer -= 2
+                col += 1
+            else:
+                buffer += 2
+                col -= 1
+
+
     @staticmethod
     def _validate_size(size):
-        default_size = 3
+        default_size = 2
         if size < 1 or size > 8:
             print(f"Invalid board size selected. Defaulting to {default_size}.")
+            return default_size
         else:
             return size
 
@@ -116,11 +150,11 @@ class BoardDisplay:
         # "7" comes from the length of 5 hexes across the board plus a buffer of the same length on either side.
         # "12" is the number of extra characters (borders, intersections) that add to the width.
         # "4" is the width added by the diagonal 'rising and falling' hex edges.
-        board_width = (self.horizontal_len * 7) + 12 + (self.diagonal_len * 4)
+        self.board_width = (self.horizontal_len * 7) + 12 + (self.diagonal_len * 4)
 
         # The middle is 3 hexes tall with 2 diagonal sections each. 2 * 3 = '6' in the calculation
         # "7" is the number of extra characters (intersections) contributing to the middle width of the board.
-        middle_height = (self.diagonal_len * 6) + 7
+        self.middle_height = (self.diagonal_len * 6) + 7
 
         # Initialize Border
 
@@ -130,7 +164,7 @@ class BoardDisplay:
         i = 3
         while not closed:
             # "-2" is to account for the border characters ("/" and "\") themselves.
-            inner_offset = board_width - (i * 2) - 2
+            inner_offset = self.board_width - (i * 2) - 2
             self.board.insert(0, list((i * " ") + "/" + (inner_offset * " ") + "\\" + (i * " ") + "\n"))
             self.board.append(list((i * " ") + "\\" + (inner_offset * " ") + "/" + (i * " ") + "\n"))
             # 
@@ -144,8 +178,8 @@ class BoardDisplay:
             self.board.append(list((i * " ") + "v" + (i * " ")))
             self.top_height += 1
 
-        for i in range(middle_height):
-            self.board.insert(i + self.top_height, list("|" + ((board_width - 2) * " ") + "|\n"))
+        for i in range(self.middle_height):
+            self.board.insert(i + self.top_height, list("|" + ((self.board_width - 2) * " ") + "|\n"))
     
     @staticmethod
     def _validate_schema(schema):
@@ -190,9 +224,9 @@ class BoardDisplay:
                 col = self.hex_origin[1] + (hex_arrangement[i][j] * (self.diagonal_len + self.horizontal_len + 2))
                 default_schema_locations.append((row, col))
 
-        new_schema_locations = []
+        new_schema_locations = [0] * 19
         for i in range(len(default_schema_locations)):
-            new_schema_locations.insert(self.hex_schema[i], default_schema_locations[self.hex_schema[i]])
+            new_schema_locations[self.hex_schema[i]] = default_schema_locations[i]
 
         return tuple(new_schema_locations)
 
@@ -221,6 +255,18 @@ class BoardDisplay:
             for j in range(6):
                 self.set_road(i, j, "WHITE")
     
+
+    def _initialize_ocean(self):
+        for i in range((self.top_height * 2) + self.middle_height):
+            index = 0
+            while self.board[i][index] == " ":
+                index += 1
+            index += 2
+            while index < (self.board_width / 2) and self.board[i][index + 1] == " " and self.board[i][index] == " ":
+                self.board[i][index] = f"\x1b[38;2;{BoardDisplay.COLORS.get("OCEAN")}m*\x1b[0m"
+                self.board[i][self.board_width - index - 1] = f"\x1b[38;2;{BoardDisplay.COLORS.get("OCEAN")}m*\x1b[0m"
+                index += 1
+
 
     def _get_location(self, hex, offset):
 
