@@ -119,7 +119,7 @@ class BoardDisplay:
     def set_hex_type(self, hex, hex_type):
         color = BoardDisplay.HEX_TYPES.get(hex_type)
 
-        row, col = self._get_location(hex, 0)
+        row, col = self._get_location(hex)
         row += 1; col += 1
         buffer = 0
         for i in range(1 + (2 * self.diagonal_len)):
@@ -132,6 +132,29 @@ class BoardDisplay:
             else:
                 buffer += 2
                 col -= 1
+
+
+    def set_robber(self, hex):
+        str = "Robber"
+        row, col = self._get_location(hex)
+        row += self.diagonal_len; col -= (self.diagonal_len - 2)
+        label_space = self.horizontal_len + (2 * (self.diagonal_len - 1))
+        if label_space < len(str):
+            for i in range(label_space):
+                self.board[row][col + i] = str[i]
+        else:
+            buffer = (label_space - len(str)) // 2
+            for i in range(len(str)):
+                self.board[row][col + i + buffer] = str[i]
+
+
+    def delete_robber(self, hex):
+        row, col = self._get_location(hex)
+        row += self.diagonal_len; col -= (self.diagonal_len - 2)
+        label_space = self.horizontal_len + (2 * (self.diagonal_len - 1))
+        char = self.board[row + 2][col]
+        for i in range(label_space):
+            self.board[row][col + i] = char
 
 
     @staticmethod
@@ -257,18 +280,21 @@ class BoardDisplay:
     
 
     def _initialize_ocean(self):
+        color_string = f"\x1b[38;2;{BoardDisplay.COLORS.get("OCEAN")}m*\x1b[0m"
         for i in range((self.top_height * 2) + self.middle_height):
             index = 0
             while self.board[i][index] == " ":
                 index += 1
             index += 2
-            while index < (self.board_width / 2) and self.board[i][index + 1] == " " and self.board[i][index] == " ":
-                self.board[i][index] = f"\x1b[38;2;{BoardDisplay.COLORS.get("OCEAN")}m*\x1b[0m"
-                self.board[i][self.board_width - index - 1] = f"\x1b[38;2;{BoardDisplay.COLORS.get("OCEAN")}m*\x1b[0m"
+            while (index < (self.board_width / 2) 
+                   and (self.board[i][index + 1] == " " or self.board[i][index + 1] == color_string) 
+                   and self.board[i][index] == " "):
+                self.board[i][index] = color_string
+                self.board[i][self.board_width - index - 1] = color_string
                 index += 1
 
 
-    def _get_location(self, hex, offset):
+    def _get_location(self, hex, offset=0):
 
         row = self.hex_locations[hex][0] + self.hex_offsets[offset][0]
         col = self.hex_locations[hex][1] + self.hex_offsets[offset][1]
