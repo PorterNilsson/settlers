@@ -15,9 +15,10 @@ class BoardDisplay:
         "OCEAN": "51;153;255",
         "PURPLE": "127;0;255",
         "SILVER": "128;128;128", 
-        "WHITE": "255;255;255"
+        "WHITE": "255;255;255",
+        "BLACK": "0;0;0"
         }
-    INTERSECTION_TYPES = ("*", "s", "C")
+    INTERSECTION_TYPES = ("default", "settlement", "city")
     HEX_TYPES = {
         "FOREST": "DARK_GREEN",
         "PASTURE": "GREEN",
@@ -61,10 +62,13 @@ class BoardDisplay:
             return
         
         row, col = self._get_location(hex, offset)
-        if color == "WHITE":
-            self.board[row][col] = intersection_type
+        if intersection_type == "default":
+            self.board[row][col] = "*"
+        elif intersection_type == "settlement":
+            self.board[row][col] = BoardDisplay._ansi_string(BoardDisplay.COLORS.get(color), "#")
         else:
-            self.board[row][col] = f"\x1b[38;2;{BoardDisplay.COLORS.get(color)}m{intersection_type}\x1b[0m"
+            self.board[row][col] = BoardDisplay._ansi_string(BoardDisplay.COLORS.get(color), " ")
+
 
 
     def set_road(self, hex, offset, color):
@@ -111,7 +115,7 @@ class BoardDisplay:
             if color == "WHITE":
                 self.board[start[0]][start[1]] = char
             else:
-                self.board[start[0]][start[1]] = f"\x1b[38;2;{BoardDisplay.COLORS.get(color)}m{char}\x1b[0m"
+                self.board[start[0]][start[1]] = BoardDisplay._ansi_string(BoardDisplay.COLORS.get(color), char)
             start[0] += row_increment
             start[1] += col_increment
 
@@ -124,7 +128,7 @@ class BoardDisplay:
         buffer = 0
         for i in range(1 + (2 * self.diagonal_len)):
             for j in range(self.horizontal_len + buffer):
-                self.board[row][col + j] = f"\x1b[38;2;{BoardDisplay.COLORS.get(color)}m*\x1b[0m"
+                self.board[row][col + j] = BoardDisplay._ansi_string(BoardDisplay.COLORS.get(color), " ")
             row += 1
             if i >= self.diagonal_len:
                 buffer -= 2
@@ -203,7 +207,7 @@ class BoardDisplay:
 
         for i in range(self.middle_height):
             self.board.insert(i + self.top_height, list("|" + ((self.board_width - 2) * " ") + "|\n"))
-    
+
     @staticmethod
     def _validate_schema(schema):
         default_schema = range(19)
@@ -270,7 +274,7 @@ class BoardDisplay:
         for i in range(19):
             # "6" is the total number of intersections for any given hex
             for j in range(6):
-                self.set_intersection(i, j, "WHITE", "*")
+                self.set_intersection(i, j, "WHITE", "default")
 
 
     def _initialize_roads(self):
@@ -280,7 +284,7 @@ class BoardDisplay:
     
 
     def _initialize_ocean(self):
-        color_string = f"\x1b[38;2;{BoardDisplay.COLORS.get("OCEAN")}m*\x1b[0m"
+        color_string = BoardDisplay._ansi_string(BoardDisplay.COLORS.get("OCEAN"), " ")
         for i in range((self.top_height * 2) + self.middle_height):
             index = 0
             while self.board[i][index] == " ":
@@ -300,6 +304,14 @@ class BoardDisplay:
         col = self.hex_locations[hex][1] + self.hex_offsets[offset][1]
 
         return row, col
+
+
+    @staticmethod
+    def _ansi_string(color, char, both=False):
+        if char == " ":
+            return f"\x1b[48;2;{color}m{char}\x1b[0m"
+        else:
+            return f"\x1b[38;2;{color}m{char}\x1b[0m"
 
 
     def __str__(self):
