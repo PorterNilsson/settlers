@@ -70,7 +70,6 @@ class BoardDisplay:
             self.board[row][col] = BoardDisplay._ansi_string(BoardDisplay.COLORS.get(color), " ")
 
 
-
     def set_road(self, hex, offset, color):
         next_offset = offset + 1
         if next_offset == 6:
@@ -160,6 +159,19 @@ class BoardDisplay:
         for i in range(label_space):
             self.board[row][col + i] = char
 
+
+    @staticmethod
+    def get_card(hex_type):
+        if hex_type not in BoardDisplay.HEX_TYPES:
+            print("Invalid card hex_type.")
+            return 
+        
+        str = ""
+        for _ in range(3):
+            for _ in range(3):
+                str += BoardDisplay._ansi_string(BoardDisplay.COLORS.get(BoardDisplay.HEX_TYPES.get(hex_type)), " ")
+            str += "\n"
+        return str
 
     @staticmethod
     def _validate_size(size):

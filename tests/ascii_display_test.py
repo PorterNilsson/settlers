@@ -1,5 +1,5 @@
-from settlers import ascii_display
+from settlers import board_display
 
 def test_display_board():
-    assert ascii_display.display_board() == 'ASCII Board'
+    assert board_display.display_board() == 'ASCII Board'
     
