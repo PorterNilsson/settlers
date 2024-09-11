@@ -51,6 +51,7 @@ class BoardDisplay:
         self._initialize_intersections()
         self._initialize_roads()
         self._initialize_ocean()
+        self._initialize_ports()
     
 
     def set_intersection(self, hex, offset, color, intersection_type):
@@ -308,6 +309,20 @@ class BoardDisplay:
                 self.board[i][index] = color_string
                 self.board[i][self.board_width - index - 1] = color_string
                 index += 1
+
+
+    def _initialize_ports(self):
+
+        port_structure = (
+            ("/", "-", "\\"),
+        )
+
+        for port in port_structure:
+            
+            row, col = self._get_location(0)
+            print(port[0])
+
+            self.board[row - 1][col + 1] = BoardDisplay._ansi_string(BoardDisplay.COLORS.get("WHITE"), port[0])
 
 
     def _get_location(self, hex, offset=0):
