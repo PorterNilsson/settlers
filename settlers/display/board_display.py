@@ -48,25 +48,29 @@ class BoardDisplay:
         col = 3
         for row in range(9, -1, -1):
             self.board[row][col] = "/"
-            self.board[row][BoardDisplay.BOARD_WIDTH - col - 2] = "\\"
+            self.board[row][BoardDisplay.BOARD_WIDTH - col - 2] = "\\" # -2 to account for indexing and newline
             self.board[BoardDisplay.BOARD_HEIGHT - row - 1][col] = "\\"
             self.board[BoardDisplay.BOARD_HEIGHT - row - 1][BoardDisplay.BOARD_WIDTH - col - 2] = "/"
-
-            self.board[10 + row][0] = "|"
-            self.board[10 + row][BoardDisplay.BOARD_WIDTH - 2] = "|"
-            self.board[BoardDisplay.BOARD_HEIGHT - 11 - row][0] = "|"
-            self.board[BoardDisplay.BOARD_HEIGHT - 11 - row][BoardDisplay.BOARD_WIDTH - 2] = "|"
-
             col += 3
+
+        for row in range(10, 29):
+            self.board[row][0] = "|"
+            self.board[row][BoardDisplay.BOARD_WIDTH - 2] = "|" # -2 to account for indexing and newline
 
 
     def _init_hexes(self):
         hex_num_row = (1, 2, 3, 2, 3, 2, 3, 2, 1)
         row = 3; col = 27 # Magic numbers describing the first hex location in the 2D char array for the board.
 
-        old_row = 0
-        for row in hex_num_row:
+        old_num = 0
+        for num in hex_num_row:
+            if num > old_num:
+                pass
+            elif num < old_num:
+                pass
 
+            old_num = num
+            row += 3 # Magic number corresponding to the newlines between interlaced hexes.
 
 
     def _init_intersections(self):
