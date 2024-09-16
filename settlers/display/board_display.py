@@ -12,11 +12,11 @@ class BoardDisplay:
     
     def _init_board(self):
         self._init_border()
+        self._init_hexes()
         self._init_intersections()
         self._init_roads()
         self._init_ports()
         self._init_ocean()
-        self._init_hexes()
         self._init_robber()
 
         
@@ -60,6 +60,15 @@ class BoardDisplay:
             col += 3
 
 
+    def _init_hexes(self):
+        hex_num_row = (1, 2, 3, 2, 3, 2, 3, 2, 1)
+        row = 3; col = 27 # Magic numbers describing the first hex location in the 2D char array for the board.
+
+        old_row = 0
+        for row in hex_num_row:
+
+
+
     def _init_intersections(self):
         pass
 
@@ -73,10 +82,6 @@ class BoardDisplay:
 
 
     def _init_ocean(self):
-        pass
-
-    
-    def _init_hexes(self):
         pass
 
 
